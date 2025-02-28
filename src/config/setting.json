@@ -1,17 +1,17 @@
 {
   "series": {
     "enabled": true,
-    "src": "F:/1/src/series",
-    "dest": "F:/1/dest/series"
+    "src": "d:\\Project\\syncmaster\\data\\src\\Mamul",
+    "dest": "d:\\Project\\syncmaster\\data\\dest\\турецкие"
   },
   "editorial_video": {
-    "enabled": false,
-    "src": "\\\\server_name\\shared_folder\\video_redaction",
-    "dest": "F:/1/dest/video_redaction"
+    "enabled": true,
+    "src": "d:\\Project\\syncmaster\\data\\src\\Редакция",
+    "dest": "d:\\Project\\syncmaster\\data\\dest\\разное\\редакция"
   },
   "turkish_video": {
     "enabled": true,
-    "src": "F:/1/src/video_turkish",
-    "dest": "F:/1/dest/video_turkish"
+    "src": "d:\\Project\\syncmaster\\data\\src\\Турция",
+    "dest": "d:\\Project\\syncmaster\\data\\dest\\разное\\турция"
   }
 }

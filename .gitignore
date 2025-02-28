@@ -28,4 +28,4 @@ Desktop.ini
 .env.test.local
 .env.production.local
 
-.data/
+data/

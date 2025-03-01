@@ -5,9 +5,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npx tsx ./src/main.js",
-    "build": "ncc build src/main.ts -m -o dist",
-    "start": "ncc build src/main.ts -m -o dist && node dist/index.js"
+    "dev": "npx tsx src/index.ts",
+    "build": "ncc build src/index.ts -o dist -m && npm run clean-fonts && npm run copy-config",
+    "run": "ncc run src/index.ts",
+    "clean-fonts": "del-cli \"dist/fonts/**\" \"!dist/fonts/Big.flf\"",
+    "copy-config": "cpx \"src/config/*\" dist/config"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -16,14 +18,18 @@
     "@eslint/js": "^9.21.0",
     "@types/figlet": "^1.7.0",
     "@types/node": "^20.0.0",
+    "@vercel/ncc": "^0.38.3",
+    "cpx": "^1.5.0",
+    "del-cli": "^6.0.0",
     "eslint": "^9.21.0",
     "globals": "^16.0.0",
     "prettier": "3.5.2",
-    "tsx": "^4.19.3",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.25.0"
   },
   "dependencies": {
-    "figlet": "^1.8.0"
+    "dotenv": "^16.4.7",
+    "figlet": "^1.8.0",
+    "winston": "^3.17.0"
   }
 }

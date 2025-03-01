@@ -1,8 +1,6 @@
-import figlet, { Fonts } from 'figlet';
+import figlet from 'figlet';
 
-export const printSyncMaster = () =>
-  console.log(
-    figlet.textSync('SyncMaster', {
-      font: 'big' as Fonts,
-    }),
-  );
+export const printSyncMaster = () => {
+  const output = figlet.textSync('SyncMaster', 'Big');
+  console.log('\x1b[32m%s\x1b[0m', output);
+};

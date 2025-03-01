@@ -1,10 +1,11 @@
 import { printSyncMaster } from './libs/greeting';
+import { logger } from './libs/logger';
 
-const main = async (): Promise<void> => {
+const main = () => {
   try {
     printSyncMaster();
   } catch (error) {
-    console.error('Ошибка:', error);
+    logger.error(error);
   }
 };
 

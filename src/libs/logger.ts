@@ -1,21 +1,12 @@
-import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
 import winston, { format } from 'winston';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import { getDir } from './settings/pathUtils';
 
 const LOG_FILE = 'syncmaster.log';
 const LOG_PATH = 'logs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const logDir =
-  process.env.NODE_ENV === 'development'
-    ? path.join(__dirname, '..', LOG_PATH)
-    : path.join(__dirname, LOG_PATH);
+const logDir = getDir(LOG_PATH);
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });

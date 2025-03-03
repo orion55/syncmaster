@@ -1,5 +1,6 @@
 export interface SeriesSettings {
   enabled: boolean;
+  name: string;
   src: string;
   dest: string;
 }

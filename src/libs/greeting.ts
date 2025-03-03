@@ -1,6 +1,7 @@
 import figlet from 'figlet';
+import colors from 'ansi-colors';
 
 export const printSyncMaster = () => {
   const output = figlet.textSync('SyncMaster', 'Big');
-  console.log('\x1b[32m%s\x1b[0m', output);
+  console.log(colors.green(output));
 };

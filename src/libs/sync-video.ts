@@ -45,11 +45,6 @@ export const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | 
   try {
     const srcFiles = fs.readdirSync(src);
 
-    if (!fs.existsSync(dest)) {
-      fs.mkdirSync(dest, { recursive: true });
-      logger.info(`Создана папка назначения: "${dest}"`);
-    }
-
     const destFiles = fs.readdirSync(dest);
     const destFilesSet = new Set(destFiles);
 

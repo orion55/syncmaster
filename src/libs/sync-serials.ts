@@ -4,6 +4,7 @@ import { SeriesSettings } from './settings/settings.types';
 import { loadCsv } from './settings/loadCsv';
 import { logger } from './logger';
 import { copyFileWithProgress } from './progress-bar';
+import colors from 'ansi-colors';
 
 const EPISODE_REGEX = /\.s\d+\.e(\d+)/i;
 const LEADING_DIGITS_REGEX = /^(\d+)/;
@@ -29,7 +30,7 @@ export const syncSerial = async (settings: SeriesSettings): Promise<Map<string, 
     return null;
   }
 
-  logger.info('Синхронизация сериалов');
+  logger.info(`Синхронизация ${colors.green('сериалов')}`);
 
   const srcExists = fs.existsSync(src);
   const destExists = fs.existsSync(dest);
@@ -73,6 +74,7 @@ export const syncSerial = async (settings: SeriesSettings): Promise<Map<string, 
         const destFilePath = path.join(destDir, newFileName);
 
         try {
+          logger.info(`Начало копирования «${colors.green(destFolderName)}»`);
           await copyFileWithProgress(srcFilePath, destFilePath);
           logger.info(
             `Скопирован файл: ${srcFolderName}\\${srcFile} -> ${destFolderName}\\${newFileName}`,
@@ -92,10 +94,10 @@ export const syncSerial = async (settings: SeriesSettings): Promise<Map<string, 
   }
 
   if (filesCopied === 0) {
-    logger.info('Новых файлов нет');
+    logger.info('Новых файлов нет\n');
     return null;
   } else {
-    logger.info(`Скопировано ${filesCopied} файлов`);
+    logger.info(`Скопировано ${filesCopied} файлов\n`);
     return filesMap;
   }
 };

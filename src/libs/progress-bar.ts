@@ -9,7 +9,7 @@ export const copyFileWithProgress = async (src: string, dest: string): Promise<v
 
   const bar = new SingleBar(
     {
-      format: colors.green('{bar}') + ' {percentage}% | {value}/{total} bytes',
+      format: 'Прогресс ' + colors.green('{bar}') + ' {percentage}%',
       barCompleteChar: '\u2588',
       barIncompleteChar: '\u2591',
       hideCursor: true,

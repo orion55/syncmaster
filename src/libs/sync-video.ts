@@ -4,6 +4,7 @@ import { SyncResult } from './sync.types';
 import { copyFileWithProgress } from './progress-bar';
 import { logger } from './logger';
 import { SeriesSettings } from './settings/settings.types';
+import colors from 'ansi-colors';
 
 const MAX_COUNT = 50;
 
@@ -29,7 +30,7 @@ export const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | 
 
   if (!enabled) return null;
 
-  logger.info(`Синхронизация «${name}»`);
+  logger.info(`Синхронизация «${colors.green(name)}»`);
 
   const srcExists = fs.existsSync(src);
   const destExists = fs.existsSync(dest);
@@ -57,6 +58,7 @@ export const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | 
           const destFile = path.join(dest, trimmedFileName);
 
           try {
+            logger.info(`Начало копирования «${colors.green(trimmedFileName)}»`);
             await copyFileWithProgress(srcFile, destFile);
             logger.info(`Скопирован файл: ${srcFile} -> ${destFile}`);
             fs.unlinkSync(srcFile);
@@ -70,10 +72,10 @@ export const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | 
     }
 
     if (files.length === 0) {
-      logger.info('Новых файлов нет');
+      logger.info('Новых файлов нет\n');
       return null;
     } else {
-      logger.info(`Скопировано ${files.length} файлов`);
+      logger.info(`Скопировано ${files.length} файлов\n`);
       return { name: name, files } as SyncResult;
     }
   } catch (error) {

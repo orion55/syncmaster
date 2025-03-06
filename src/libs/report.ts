@@ -3,6 +3,7 @@ import * as path from 'path';
 import { SyncResult } from './sync.types';
 import { getDir } from './settings/pathUtils';
 import { logger } from './logger';
+import { generateReportFileName, sortSeriesByKey, sortSyncResult } from './report-utils';
 
 const REPORT_PATH = 'report';
 
@@ -12,39 +13,35 @@ interface InputData {
   turkish: SyncResult | null;
 }
 
-const generateReportFileName = (): string => {
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2, '0');
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const yyyy = now.getFullYear();
-  const HH = String(now.getHours()).padStart(2, '0');
-  const MM = String(now.getMinutes()).padStart(2, '0');
-  return `report_${dd}${mm}${yyyy}_${HH}${MM}.txt`;
-};
-
 export const report = (input: InputData) => {
   const { series, editorial, turkish } = input;
   let content = '';
 
   if (series) {
+    const sortedSeries = sortSeriesByKey(series);
+
     content += 'Турецкие\n';
-    series.forEach((count, title) => {
+    sortedSeries?.forEach((count, title) => {
       content += count === 1 ? `\t${title}\n` : `\t${title} - ${count} серии\n`;
     });
     content += '\n';
   }
 
   if (editorial) {
-    content += `${editorial.name}\n`;
-    editorial.files.forEach((file) => {
+    const sortedEditorial = sortSyncResult(editorial);
+
+    content += `${sortedEditorial.name}\n`;
+    sortedEditorial.files.forEach((file) => {
       content += `\t${path.parse(file).name}\n`;
     });
     content += '\n';
   }
 
   if (turkish) {
-    content += `${turkish.name}\n`;
-    turkish.files.forEach((file) => {
+    const sortedTurkish = sortSyncResult(turkish);
+
+    content += `${sortedTurkish.name}\n`;
+    sortedTurkish.files.forEach((file) => {
       content += `\t${path.parse(file).name}\n`;
     });
   }

@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SyncResult } from './sync.types';
 import { getDir } from './settings/pathUtils';
-import { logger } from './logger';
-import { generateReportFileName, sortSeriesByKey, sortSyncResult } from './report-utils';
+import { logger } from './logger.service';
+import { generateReportFileName, sortSeriesByKey, sortSyncResult } from './helpers/report-utils';
 
-const REPORT_PATH = 'report';
+const REPORT_PATH = 'reportService';
 
 interface InputData {
   series: Map<string, number> | null;
@@ -13,7 +13,7 @@ interface InputData {
   turkish: SyncResult | null;
 }
 
-export const report = (input: InputData) => {
+const report = (input: InputData) => {
   const { series, editorial, turkish } = input;
   let content = '';
 
@@ -61,3 +61,5 @@ export const report = (input: InputData) => {
     logger.info(`Отчёт создан: ${filePath}`);
   }
 };
+
+export { report };

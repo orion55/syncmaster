@@ -1,9 +1,9 @@
-import { printSyncMaster } from './libs/greeting';
-import { logger } from './libs/logger';
-import { loadSettings } from './libs/settings/loadSettings';
-import { syncSerial } from './libs/sync-serials';
-import { syncVideo } from './libs/sync-video';
-import { report } from './libs/report';
+import { printSyncMaster } from './services/helpers/greeting';
+import { logger } from './services/logger.service';
+import { loadSettings } from './services/settings/settings.service';
+import { syncSerial } from './services/serial.service';
+import { report } from './services/report.service';
+import { syncVideo } from './services/video.service';
 
 const main = async () => {
   try {

@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { SeriesSettings } from './settings/settings.types';
 import { loadCsv } from './settings/loadCsv';
-import { logger } from './logger';
-import { copyFileWithProgress } from './progress-bar';
+import { logger } from './logger.service';
+import { copyFileWithProgress } from './helpers/progress-bar';
 import colors from 'ansi-colors';
 
 const EPISODE_REGEX = /\.s\d+\.e(\d+)/i;
@@ -22,7 +22,7 @@ const transformFileName = (srcFileName: string): string => {
   return srcFileName;
 };
 
-export const syncSerial = async (settings: SeriesSettings): Promise<Map<string, number> | null> => {
+const syncSerial = async (settings: SeriesSettings): Promise<Map<string, number> | null> => {
   const { enabled, src, dest } = settings;
 
   if (!enabled) {
@@ -67,6 +67,11 @@ export const syncSerial = async (settings: SeriesSettings): Promise<Map<string, 
       }
 
       for (const srcFile of srcFiles) {
+        if (path.extname(srcFile).toLowerCase() === '.!qb') {
+          logger.info(`Пропущен файл: ${srcFile}`);
+          continue;
+        }
+
         const newFileName = transformFileName(srcFile);
         if (destFiles.includes(newFileName)) continue;
 
@@ -101,3 +106,5 @@ export const syncSerial = async (settings: SeriesSettings): Promise<Map<string, 
     return filesMap;
   }
 };
+
+export { syncSerial };

@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SyncResult } from './sync.types';
-import { copyFileWithProgress } from './progress-bar';
-import { logger } from './logger';
+import { copyFileWithProgress } from './helpers/progress-bar';
+import { logger } from './logger.service';
 import { SeriesSettings } from './settings/settings.types';
 import colors from 'ansi-colors';
 
@@ -25,7 +25,7 @@ const trimFileName = (fileName: string): string => {
   return trimmedBase + extension;
 };
 
-export const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | null> => {
+const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | null> => {
   const { enabled, name, src, dest } = settings;
 
   if (!enabled) return null;
@@ -83,3 +83,5 @@ export const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | 
     return null;
   }
 };
+
+export { syncVideo };

@@ -6,10 +6,12 @@ import { getDir } from './pathUtils';
 const CONFIG_PATH = 'config';
 const SETTING_FILE = 'setting.json';
 
-export const loadSettings = (): Settings => {
+const loadSettings = (): Settings => {
   const configDir = getDir(CONFIG_PATH);
 
   const settingsPath = path.join(configDir, SETTING_FILE);
   const settingsContent = fs.readFileSync(settingsPath, 'utf8');
   return JSON.parse(settingsContent);
 };
+
+export { loadSettings };

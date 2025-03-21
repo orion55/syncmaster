@@ -1,14 +1,29 @@
 {
   "name": "syncmaster",
   "description": "Программа для синхронизации сериалов и видео с созданием отчётов",
-  "version": "1.0.2",
-  "private": true,
+  "version": "1.0.4",
   "type": "module",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orion55/syncmaster.git"
+  },
+  "keywords": [
+    "синхронизация",
+    "сериалы",
+    "видео",
+    "отчёты"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "clean-fonts": "del-cli \"dist/fonts/**\" \"!dist/fonts/Big.flf\"",
     "copy-config": "cpx \"src/config/*\" dist/config",
     "dev": "npx tsx src/index.ts",
     "build": "ncc build src/index.ts -o dist -m && npm run clean-fonts && npm run copy-config",
+    "prepublishOnly": "npm run build",
     "run": "ncc run src/index.ts"
   },
   "engines": {

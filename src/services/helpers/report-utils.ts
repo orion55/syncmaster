@@ -1,4 +1,4 @@
-import { SyncResult } from './sync.types';
+import { SyncResult } from '../sync.types';
 
 export const sortSeriesByKey = (series: Map<string, number> | null): Map<string, number> | null => {
   if (series === null) return null;

@@ -28,7 +28,7 @@ const consoleFormat = format.combine(
   }),
 );
 
-export const logger = winston.createLogger({
+const logger = winston.createLogger({
   level: 'info',
   format: format.combine(
     format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
@@ -46,3 +46,5 @@ export const logger = winston.createLogger({
     }),
   ],
 });
+
+export { logger };

@@ -5,7 +5,7 @@ import { getDir } from './settings/pathUtils';
 import { logger } from './logger.service';
 import { generateReportFileName, sortSeriesByKey, sortSyncResult } from './helpers/report-utils';
 
-const REPORT_PATH = 'reportService';
+const REPORT_PATH = 'report';
 
 interface InputData {
   series: Map<string, number> | null;

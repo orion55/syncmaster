@@ -6,7 +6,7 @@ import { logger } from './logger.service';
 import { copyFileWithProgress } from './helpers/progress-bar';
 import colors from 'ansi-colors';
 
-const EPISODE_REGEX = /\.s\d+\.e(\d+)/i;
+const EPISODE_REGEX = /\.s\d+\.?e(\d+)/i;
 const LEADING_DIGITS_REGEX = /^(\d+)/;
 
 const transformFileName = (srcFileName: string): string => {

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SyncResult } from './sync.types';
-import { getDir } from './settings/pathUtils';
+import { APP_DIR } from '../appDir';
 import { logger } from './logger.service';
 import { generateReportFileName, sortSeriesByKey, sortSyncResult } from './helpers/report-utils';
 
@@ -47,7 +47,7 @@ const report = (input: InputData) => {
   }
 
   if (content.length !== 0) {
-    const reportDir = getDir(REPORT_PATH);
+    const reportDir = path.join(APP_DIR, REPORT_PATH);
 
     if (!fs.existsSync(reportDir)) {
       fs.mkdirSync(reportDir, { recursive: true });

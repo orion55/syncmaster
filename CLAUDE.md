@@ -16,16 +16,30 @@ SyncMaster is a Node.js/TypeScript CLI utility that synchronizes TV series and v
 
 There are no tests in this project.
 
-## Runtime Layout & the `getDir` Convention
+## Runtime Layout & `APP_DIR`
 
-`src/services/settings/pathUtils.ts` exports `getDir(folder)` which resolves paths differently depending on `NODE_ENV`:
+`src/appDir.ts` exports a single constant:
 
-- **development** (`npm run dev`): resolves to `<repo>/<folder>` — i.e. `src/config`, `src/logs`, `src/report`
-- **production** (bundled `dist/index.js`): resolves relative to the bundled file — i.e. `dist/config`, `dist/logs`, `dist/report`
+```ts
+export const APP_DIR = path.dirname(fileURLToPath(import.meta.url));
+```
 
-Every module that touches the filesystem for config, logs, or reports goes through `getDir` rather than hardcoding paths. When adding a new runtime resource folder, follow the same pattern and make sure the build script copies it into `dist/` (see `copy-config` script for the template).
+- **development** (`npm run dev` / `npx tsx src/index.ts`): `APP_DIR` = `<repo>/src/`
+- **production** (ncc-bundled `dist/index.js`): every module is inlined into one file, so `import.meta.url` always points to the bundle → `APP_DIR` = `<deploy-dir>/`
 
-`dotenv.config()` is called inside `pathUtils.ts`, so `.env` is the single source of truth for `NODE_ENV` — do not re-initialize dotenv elsewhere.
+All runtime directories are flat siblings of `APP_DIR` — no nested `src/` or `dist/` prefix:
+
+```
+<APP_DIR>/
+├── config/    ← setting.json, soap.csv
+├── fonts/     ← Big.flf (prod only, bundled by ncc)
+├── logs/      ← syncmaster-YYYY-MM-DD.log, audit.json
+└── report/    ← report_DDMMYYYY_HHMM.txt
+```
+
+Every module that touches the filesystem imports `APP_DIR` and does `path.join(APP_DIR, 'config')` etc. There is no `NODE_ENV` check and no `pathUtils.ts`. When adding a new runtime resource folder, follow the same pattern and make sure the build script copies it into `dist/`.
+
+`dotenv.config()` is called inside `logger.service.ts` (via `import * as dotenv from 'dotenv'` + an explicit `dotenv.config()` call — **not** a side-effect import). It is the single `.env` entry point for the whole app: do not re-initialize dotenv elsewhere and do not add side-effect imports to simulate env loading. This works because `src/index.ts` imports `logger.service` at line 2, before any module that reads env-driven config. **Invariant:** `logger.service` must remain the second import in `index.ts`. Do not reorder it.
 
 ## Architecture
 
@@ -57,11 +71,11 @@ All three sync functions return `null` when `enabled: false`, when source/dest f
 ### `report.service.ts`
 
 - Builds sections for `series` (from `Map`), `editorial`, and `turkish` (from `SyncResult`), each sorted via `sortSeriesByKey`/`sortSyncResult` (locale-aware).
-- Writes to `<reportDir>/report_DDMMYYYY_HHMM.txt` only if at least one section has content. Skips the file entirely when nothing was synced.
+- Writes to `<APP_DIR>/report/report_DDMMYYYY_HHMM.txt` only if at least one section has content. Skips the file entirely when nothing was synced.
 
 ### `logger.service.ts`
 
-Winston logger with two transports: colorized console and plain-text file at `<logDir>/syncmaster.log`. Both use `DD-MM-YYYY HH:mm:ss` timestamps. The log directory is created on import via `getDir('logs')`.
+Winston logger with two transports: colorized console and a daily-rotated file via `winston-daily-rotate-file`. Files live at `<logDir>/syncmaster-YYYY-MM-DD.log` with `20m` max size, `30d` retention, gzip archival, and an `audit.json` rotation manifest. `logDir` = `process.env.LOG_DIR` (resolved absolute) when set, otherwise `path.join(APP_DIR, 'logs')`. This module is also the project-wide dotenv entry point: it imports `* as dotenv from 'dotenv'` (namespace import) and calls `dotenv.config()` before reading any env var. Console uses `DD-MM-YYYY HH:mm:ss` timestamps; the file transport uses `YYYY-MM-DD HH:mm:ss`. Both transports share a `customFormat` printf that appends JSON-serialized meta and stack traces, with `Error` instances serialized via a custom replacer. The same transports are registered as `exceptionHandlers`, and `exitOnError: false` keeps the process alive on logged exceptions.
 
 ## Build Notes
 

@@ -1,20 +1,23 @@
 import path from 'path';
-import fs from 'fs';
-import winston, { format } from 'winston';
-import { getDir } from './settings/pathUtils';
+import * as dotenv from 'dotenv';
+import type winston from 'winston';
+import { createLogger, format, transports } from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import { APP_DIR } from '../appDir';
 
-const LOG_FILE = 'syncmaster.log';
-const LOG_PATH = 'logs';
+dotenv.config();
 
-const logDir = getDir(LOG_PATH);
+const logDir = process.env.LOG_DIR ? path.resolve(process.env.LOG_DIR) : path.join(APP_DIR, 'logs');
 
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
-}
+const serializeMeta = (meta: object) =>
+  JSON.stringify(meta, (_key, value) =>
+    value instanceof Error ? { message: value.message, stack: value.stack } : value,
+  );
 
-const customFormat = format.printf(({ timestamp, level, message, ...meta }) => {
-  const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
-  return `${timestamp} [${level}]: ${message} ${metaString}`;
+const customFormat = format.printf(({ timestamp, level, message, stack, ...meta }) => {
+  const metaStr = Object.keys(meta).length ? ` ${serializeMeta(meta)}` : '';
+  const stackStr = stack ? `\n${stack}` : '';
+  return `${timestamp} [${level}]: ${message}${metaStr}${stackStr}`;
 });
 
 const consoleFormat = format.combine(
@@ -22,13 +25,32 @@ const consoleFormat = format.combine(
   format.errors({ stack: true }),
   format.splat(),
   format.colorize({ all: false }),
-  format.printf(({ timestamp, level, message, ...meta }) => {
-    const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
-    return `${timestamp} [${level}]: ${message} ${metaString}`;
+  format.printf(({ timestamp, level, message, stack, ...meta }) => {
+    const metaStr = Object.keys(meta).length ? ` ${serializeMeta(meta)}` : '';
+    const stackStr = stack ? `\n${stack}` : '';
+    return `${timestamp} [${level}]: ${message}${metaStr}${stackStr}`;
   }),
 );
 
-const logger = winston.createLogger({
+const fileTransport = new DailyRotateFile({
+  filename: path.join(logDir, 'syncmaster-%DATE%.log'),
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '30d',
+  auditFile: path.join(logDir, 'audit.json'),
+  format: format.combine(
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.errors({ stack: true }),
+    customFormat,
+  ),
+});
+
+const consoleTransport = new transports.Console({
+  format: consoleFormat,
+});
+
+const logger: winston.Logger = createLogger({
   level: 'info',
   format: format.combine(
     format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
@@ -36,15 +58,9 @@ const logger = winston.createLogger({
     format.splat(),
     customFormat,
   ),
-  transports: [
-    new winston.transports.Console({
-      format: consoleFormat,
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, LOG_FILE),
-      format: customFormat,
-    }),
-  ],
+  transports: [fileTransport, consoleTransport],
+  exceptionHandlers: [fileTransport, consoleTransport],
+  exitOnError: false,
 });
 
 export { logger };

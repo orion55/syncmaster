@@ -3,25 +3,14 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+const exists = (baseDir: string, ...files: string[]): boolean =>
+  files.some((file) => fs.existsSync(path.join(baseDir, file)));
 
-const hasFile = (baseDir: string, relativePath: string): boolean =>
-  fs.existsSync(path.join(baseDir, relativePath));
+export const ROOT_DIR =
+  [process.cwd(), path.resolve(moduleDir, '..')].find((dir) => exists(dir, 'package.json')) ??
+  process.cwd();
 
-const resolveProjectRoot = (): string => {
-  const candidates = [process.cwd(), path.resolve(moduleDir, '..')];
-
-  return candidates.find((candidate) => hasFile(candidate, 'package.json')) ?? process.cwd();
-};
-
-const resolveRuntimeDir = (projectRoot: string): string => {
-  const candidates = [moduleDir, path.join(projectRoot, 'src'), path.join(projectRoot, 'dist')];
-
-  return (
-    candidates.find(
-      (candidate) => hasFile(candidate, 'index.ts') || hasFile(candidate, 'index.js'),
-    ) ?? moduleDir
-  );
-};
-
-export const ROOT_DIR = resolveProjectRoot();
-export const APP_DIR = resolveRuntimeDir(ROOT_DIR);
+export const APP_DIR =
+  [moduleDir, path.join(ROOT_DIR, 'src'), path.join(ROOT_DIR, 'dist')].find((dir) =>
+    exists(dir, 'index.ts', 'index.js'),
+  ) ?? moduleDir;

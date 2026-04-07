@@ -5,11 +5,13 @@ export interface SeriesSettings {
   dest: string;
 }
 
+export interface SeriesMapItem {
+  src: string;
+  dest: string;
+}
+
 export interface Settings {
   series: SeriesSettings;
   editorial_video: SeriesSettings;
-}
-
-export interface CsvEntries {
-  [key: string]: string;
+  series_map: SeriesMapItem[];
 }

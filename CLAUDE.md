@@ -9,7 +9,7 @@ SyncMaster is a Node.js/TypeScript CLI utility that synchronizes TV series and v
 ## Commands
 
 - `npm run dev` — run from TypeScript source via `tsx` (uses `NODE_ENV=development` from `.env`)
-- `npm run build` — bundle `src/index.ts` to a single `dist/index.js` with `@vercel/ncc`, then prune `dist/fonts/` to keep only `Big.flf` and copy `src/config/*` to `dist/config`
+- `npm run build` — bundle `src/index.ts` to a single `dist/index.js` with `@vercel/ncc`
 - `npm run run` — `ncc run src/index.ts` (on-the-fly bundle + execute)
 - `npx eslint .` — lint (no npm script wrapper); config is flat `eslint.config.js` with `@eslint/js` + `typescript-eslint` recommended
 - `npx prettier --write .` — format (config in `.prettierrc`, 100 col, single quotes, trailing commas)
@@ -31,13 +31,12 @@ All runtime directories are flat siblings of `APP_DIR` — no nested `src/` or `
 
 ```
 <APP_DIR>/
-├── config/    ← setting.json, soap.csv
 ├── fonts/     ← Big.flf (prod only, bundled by ncc)
 ├── logs/      ← syncmaster-YYYY-MM-DD.log, audit.json
 └── report/    ← report_DDMMYYYY_HHMM.txt
 ```
 
-Every module that touches the filesystem imports `APP_DIR` and does `path.join(APP_DIR, 'config')` etc. There is no `NODE_ENV` check and no `pathUtils.ts`. When adding a new runtime resource folder, follow the same pattern and make sure the build script copies it into `dist/`.
+Every module that touches the runtime folders imports `APP_DIR` and does `path.join(APP_DIR, 'report')` etc. Settings are not resolved from `APP_DIR`: `settings.yml` is loaded through `SETTINGS_PATH` (falling back to `./settings.yml` from the project root). There is no `NODE_ENV` check and no `pathUtils.ts`.
 
 `dotenv.config()` is called inside `logger.service.ts` (via `import * as dotenv from 'dotenv'` + an explicit `dotenv.config()` call — **not** a side-effect import). It is the single `.env` entry point for the whole app: do not re-initialize dotenv elsewhere and do not add side-effect imports to simulate env loading. This works because `src/index.ts` imports `logger.service` at line 2, before any module that reads env-driven config. **Invariant:** `logger.service` must remain the second import in `index.ts`. Do not reorder it.
 
@@ -46,7 +45,7 @@ Every module that touches the filesystem imports `APP_DIR` and does `path.join(A
 Entry point `src/index.ts` is a linear pipeline:
 
 1. `printSyncMaster()` — figlet banner
-2. `loadSettings()` — reads `config/setting.json` into a `Settings` object with two `SeriesSettings` blocks: `series`, `editorial_video` (each has `enabled`, `name`, `src`, `dest`)
+2. `loadSettings()` — reads `settings.yml` from `SETTINGS_PATH` into a `Settings` object with `series`, `editorial_video`, and `series_map` as an array of `{ src, dest }`
 3. `syncSerial(settings.series)` — series sync
 4. `syncVideo(settings.editorial_video)` — generic video sync
 5. `report({ series, editorial })` — writes the report file
@@ -55,7 +54,7 @@ All three sync functions return `null` when `enabled: false`, when source/dest f
 
 ### `serial.service.ts` (series sync)
 
-- Uses `loadCsv()` to read `config/soap.csv` (`;`-delimited `srcFolder;destFolder` mapping). The CSV drives which subfolders are synced and how they're renamed on the destination side.
+- Uses `series_map` from `settings.yml` as an array of `{ src, dest }` objects to drive which subfolders are synced and how they're renamed on the destination side.
 - For each mapped folder, it renames each source file via `transformFileName`: first tries `EPISODE_REGEX = /\.s\d+\.?e(\d+)/i` to extract the episode number, then falls back to `LEADING_DIGITS_REGEX = /^(\d+)/`, otherwise keeps the original name.
 - Skips any file with extension `.!qb` (qBittorrent in-progress marker).
 - Does **not** delete source files after copying.
@@ -80,5 +79,5 @@ Winston logger with two transports: colorized console and a daily-rotated file v
 ## Build Notes
 
 - `@vercel/ncc` bundles everything into a single `dist/index.js`, including figlet fonts. The `clean-fonts` script (`del-cli`) removes all bundled fonts except `Big.flf` because `greeting.ts` only uses that font — keep this in sync if the banner font changes.
-- `src/config/*` must be copied into `dist/config` for the production build to find `setting.json` / `soap.csv`; this is what `copy-config` does.
+- `settings.yml` is external to the bundle and should be deployed alongside the app (or referenced by an absolute `SETTINGS_PATH`).
 - `syncMaster.bat` at the repo root references `d:\Prog\syncmaster\index.js` — this is a local launcher for a deployed copy, not for running from the repo.

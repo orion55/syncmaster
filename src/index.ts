@@ -9,7 +9,7 @@ const main = async () => {
   try {
     printSyncMaster();
     const settings = loadSettings();
-    const series = await syncSerial(settings.series);
+    const series = await syncSerial(settings.series, settings.series_map);
     const editorial = await syncVideo(settings.editorial_video);
     report({ series, editorial });
   } catch (error) {

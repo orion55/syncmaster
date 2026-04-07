@@ -1,7 +1,7 @@
-import { say } from 'cfonts';
+import cfonts from 'cfonts';
 
 export const printSyncMaster = () => {
-  say('SyncMaster', {
+  cfonts.say('SyncMaster', {
     font: 'block',
     colors: ['green', 'gray'],
     background: 'transparent',

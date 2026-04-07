@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { SeriesSettings } from './settings/settings.types';
-import { loadCsv } from './settings/loadCsv';
+import { SeriesMapItem, SeriesSettings } from './settings/settings.types';
 import { logger } from './logger.service';
 import { copyFileWithProgress } from './helpers/progress-bar';
 import colors from 'ansi-colors';
@@ -22,7 +21,10 @@ const transformFileName = (srcFileName: string): string => {
   return srcFileName;
 };
 
-const syncSerial = async (settings: SeriesSettings): Promise<Map<string, number> | null> => {
+const syncSerial = async (
+  settings: SeriesSettings,
+  seriesMap: SeriesMapItem[],
+): Promise<Map<string, number> | null> => {
   const { enabled, src, dest } = settings;
 
   if (!enabled) {
@@ -41,11 +43,10 @@ const syncSerial = async (settings: SeriesSettings): Promise<Map<string, number>
     return null;
   }
 
-  const series = loadCsv();
   let filesCopied = 0;
   const filesMap = new Map<string, number>();
 
-  for (const [srcFolderName, destFolderName] of Object.entries(series)) {
+  for (const { src: srcFolderName, dest: destFolderName } of seriesMap) {
     const srcDir = path.join(src, srcFolderName);
     const destDir = path.join(dest, destFolderName);
 

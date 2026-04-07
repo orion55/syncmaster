@@ -17,7 +17,9 @@ const resolveRuntimeDir = (projectRoot: string): string => {
   const candidates = [moduleDir, path.join(projectRoot, 'src'), path.join(projectRoot, 'dist')];
 
   return (
-    candidates.find((candidate) => hasFile(candidate, path.join('config', 'setting.json'))) ?? moduleDir
+    candidates.find(
+      (candidate) => hasFile(candidate, 'index.ts') || hasFile(candidate, 'index.js'),
+    ) ?? moduleDir
   );
 };
 

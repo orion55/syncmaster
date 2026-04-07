@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "D:\\Project\\syncmaster\\logs\\audit.json",
+    "files": [
+        {
+            "date": 1775583200274,
+            "name": "D:\\Project\\syncmaster\\logs\\syncmaster-2026-04-07.log",
+            "hash": "b5751dee0292fe183f951b30cb814b8ba39f688e5f22aac5e19d2059b331ad3e"
+        }
+    ],
+    "hashType": "sha256"
+}

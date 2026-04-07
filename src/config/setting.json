@@ -10,11 +10,5 @@
     "name": "Редакция",
     "src": "d:\\Project\\syncmaster\\data\\src\\Редакция",
     "dest": "d:\\Project\\syncmaster\\data\\dest\\Разное\\Редакция"
-  },
-  "turkish_video": {
-    "enabled": true,
-    "name": "Турция",
-    "src": "d:\\Project\\syncmaster\\data\\src\\Турция",
-    "dest": "d:\\Project\\syncmaster\\data\\dest\\разное\\турция"
   }
 }

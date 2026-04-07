@@ -3,11 +3,11 @@ import * as dotenv from 'dotenv';
 import type winston from 'winston';
 import { createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
-import { APP_DIR } from '../appDir';
+import { ROOT_DIR } from '../appDir';
 
 dotenv.config();
 
-const logDir = process.env.LOG_DIR ? path.resolve(process.env.LOG_DIR) : path.join(APP_DIR, 'logs');
+const logDir = process.env.LOG_DIR ? path.resolve(process.env.LOG_DIR) : path.join(ROOT_DIR, 'logs');
 
 const serializeMeta = (meta: object) =>
   JSON.stringify(meta, (_key, value) =>

@@ -7,7 +7,6 @@ const CONFIG_PATH = 'config';
 const SETTING_FILE = 'setting.json';
 
 const loadSettings = (): Settings => {
-  console.log({ APP_DIR });
   const configDir = path.join(APP_DIR, CONFIG_PATH);
 
   const settingsPath = path.join(configDir, SETTING_FILE);

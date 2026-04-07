@@ -46,10 +46,10 @@ Every module that touches the filesystem imports `APP_DIR` and does `path.join(A
 Entry point `src/index.ts` is a linear pipeline:
 
 1. `printSyncMaster()` — figlet banner
-2. `loadSettings()` — reads `config/setting.json` into a `Settings` object with three `SeriesSettings` blocks: `series`, `editorial_video`, `turkish_video` (each has `enabled`, `name`, `src`, `dest`)
+2. `loadSettings()` — reads `config/setting.json` into a `Settings` object with two `SeriesSettings` blocks: `series`, `editorial_video` (each has `enabled`, `name`, `src`, `dest`)
 3. `syncSerial(settings.series)` — series sync
-4. `syncVideo(settings.editorial_video)` and `syncVideo(settings.turkish_video)` — generic video sync
-5. `report({ series, editorial, turkish })` — writes the report file
+4. `syncVideo(settings.editorial_video)` — generic video sync
+5. `report({ series, editorial })` — writes the report file
 
 All three sync functions return `null` when `enabled: false`, when source/dest folders don't exist, or when nothing was copied; `report()` skips any section whose input is `null`.
 
@@ -70,7 +70,7 @@ All three sync functions return `null` when `enabled: false`, when source/dest f
 
 ### `report.service.ts`
 
-- Builds sections for `series` (from `Map`), `editorial`, and `turkish` (from `SyncResult`), each sorted via `sortSeriesByKey`/`sortSyncResult` (locale-aware).
+- Builds sections for `series` (from `Map`) and `editorial` (from `SyncResult`), each sorted via `sortSeriesByKey`/`sortSyncResult` (locale-aware).
 - Writes to `<APP_DIR>/report/report_DDMMYYYY_HHMM.txt` only if at least one section has content. Skips the file entirely when nothing was synced.
 
 ### `logger.service.ts`

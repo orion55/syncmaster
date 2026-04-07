@@ -11,8 +11,7 @@ const main = async () => {
     const settings = loadSettings();
     const series = await syncSerial(settings.series);
     const editorial = await syncVideo(settings.editorial_video);
-    const turkish = await syncVideo(settings.turkish_video);
-    report({ series, editorial, turkish });
+    report({ series, editorial });
   } catch (error) {
     logger.error(error);
   }

@@ -10,11 +10,10 @@ const REPORT_PATH = 'report';
 interface InputData {
   series: Map<string, number> | null;
   editorial: SyncResult | null;
-  turkish: SyncResult | null;
 }
 
 const report = (input: InputData) => {
-  const { series, editorial, turkish } = input;
+  const { series, editorial } = input;
   let content = '';
 
   if (series) {
@@ -35,15 +34,6 @@ const report = (input: InputData) => {
       content += `\t${path.parse(file).name}\n`;
     });
     content += '\n';
-  }
-
-  if (turkish) {
-    const sortedTurkish = sortSyncResult(turkish);
-
-    content += `${sortedTurkish.name}\n`;
-    sortedTurkish.files.forEach((file) => {
-      content += `\t${path.parse(file).name}\n`;
-    });
   }
 
   if (content.length !== 0) {

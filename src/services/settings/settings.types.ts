@@ -8,7 +8,6 @@ export interface SeriesSettings {
 export interface Settings {
   series: SeriesSettings;
   editorial_video: SeriesSettings;
-  turkish_video: SeriesSettings;
 }
 
 export interface CsvEntries {

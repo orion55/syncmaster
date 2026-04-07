@@ -1,7 +1,9 @@
-import figlet from 'figlet';
-import colors from 'ansi-colors';
+import { say } from 'cfonts';
 
 export const printSyncMaster = () => {
-  const output = figlet.textSync('SyncMaster', 'Big');
-  console.log(colors.green(output));
+  say('SyncMaster', {
+    font: 'block',
+    colors: ['green', 'gray'],
+    background: 'transparent',
+  });
 };

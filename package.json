@@ -20,6 +20,7 @@
   ],
   "scripts": {
     "dev": "npx tsx src/index.ts",
+    "menu": "npx tsx src/menu-editor.ts",
     "build": "ncc build src/index.ts -o dist -m",
     "prepublishOnly": "npm run build",
     "run": "ncc run src/index.ts"

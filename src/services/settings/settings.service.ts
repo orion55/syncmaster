@@ -6,7 +6,7 @@ import { ROOT_DIR } from '../../appDir';
 
 const DEFAULT_SETTINGS_PATH = 'settings.yml';
 
-const resolveSettingsPath = (): string => {
+export const resolveSettingsPath = (): string => {
   const settingsPath = process.env.SETTINGS_PATH?.trim() || DEFAULT_SETTINGS_PATH;
   return path.isAbsolute(settingsPath) ? settingsPath : path.resolve(ROOT_DIR, settingsPath);
 };

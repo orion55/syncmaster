@@ -11,21 +11,19 @@ editorial_video:
   dest: d:\Project\syncmaster\data\dest\Редакция
 
 series_map:
-  - src: A.B.I.s01.WEB-DLRip1080p
-    dest: Семья - это испытание
-  - src: Ayni Yagmur Altinda.s01.WEB-DLRip1080p
-    dest: Под одним дождём
   - src: Dalekiy gorod 2 sezon
     dest: Далёкий город
+  - src: Zavist
+    dest: Зависть
+  - src: Ayni Yagmur Altinda.s01.WEB-DLRip1080p
+    dest: Под одним дождём
   - src: Güller ve Günahlar.s01.WEB-DLRip1080p.zhekannov
     dest: Розы и грехи
-  - src: Memory.of.a.Killer.S01.2026.WEB-DLRip.x264.seleZen
-    dest: Память убийцы
-  - src: Tasacak Bu Deniz.s01.WEB-DLRip1080p
-    dest: Это море переполнится
+  - src: A.B.I.s01.WEB-DLRip1080p
+    dest: Семья - это испытание
   - src: Sevdigim Sensin.s01.WEB-DLRip1080p
     dest: Ты — тот, кого я люблю
   - src: Sheriff.Country.2025.S01.WEB-DL.1080p.TVShows.LE-Production
     dest: Шериф округа
-  - src: Zavist
-    dest: Зависть
+  - src: Tasacak Bu Deniz.s01.WEB-DLRip1080p
+    dest: Это море переполнится

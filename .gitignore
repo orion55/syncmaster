@@ -29,3 +29,5 @@ Desktop.ini
 .env.production.local
 
 data/
+report/
+logs/

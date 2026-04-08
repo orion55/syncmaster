@@ -11,7 +11,7 @@ const main = async () => {
     const settings = loadSettings();
     const series = await syncSerial(settings.series, settings.series_map);
     const editorial = await syncVideo(settings.editorial_video);
-    report({ series, editorial });
+    report({ series, editorial, seriesName: settings.series.name });
   } catch (error) {
     logger.error(error);
   }

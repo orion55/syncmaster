@@ -8,7 +8,7 @@ editorial_video:
   enabled: true
   name: Редакция
   src: d:\Project\syncmaster\data\src\Редакция
-  dest: d:\Project\syncmaster\data\dest\Разное\Редакция
+  dest: d:\Project\syncmaster\data\dest\Редакция
 
 series_map:
   - src: A.B.I.s01.WEB-DLRip1080p

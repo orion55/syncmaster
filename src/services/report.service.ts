@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { SyncResult } from './sync.types';
-import { APP_DIR } from '../appDir';
+import { ROOT_DIR } from '../appDir';
 import { logger } from './logger.service';
 import { generateReportFileName, sortSeriesByKey, sortSyncResult } from './helpers/report-utils';
 
@@ -10,16 +10,17 @@ const REPORT_PATH = 'report';
 interface InputData {
   series: Map<string, number> | null;
   editorial: SyncResult | null;
+  seriesName: string;
 }
 
 const report = (input: InputData) => {
-  const { series, editorial } = input;
+  const { series, editorial, seriesName } = input;
   let content = '';
 
   if (series) {
     const sortedSeries = sortSeriesByKey(series);
 
-    content += 'Турецкие\n';
+    content += `${seriesName}\n`;
     sortedSeries?.forEach((count, title) => {
       content += count === 1 ? `\t${title}\n` : `\t${title} - ${count} серии\n`;
     });
@@ -36,8 +37,8 @@ const report = (input: InputData) => {
     content += '\n';
   }
 
-  if (content.length !== 0) {
-    const reportDir = path.join(APP_DIR, REPORT_PATH);
+  if (content.length > 0) {
+    const reportDir = path.join(ROOT_DIR, REPORT_PATH);
 
     if (!fs.existsSync(reportDir)) {
       fs.mkdirSync(reportDir, { recursive: true });

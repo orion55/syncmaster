@@ -7,10 +7,5 @@ const exists = (baseDir: string, ...files: string[]): boolean =>
   files.some((file) => fs.existsSync(path.join(baseDir, file)));
 
 export const ROOT_DIR =
-  [process.cwd(), path.resolve(moduleDir, '..')].find((dir) => exists(dir, 'package.json')) ??
-  process.cwd();
-
-export const APP_DIR =
-  [moduleDir, path.join(ROOT_DIR, 'src'), path.join(ROOT_DIR, 'dist')].find((dir) =>
-    exists(dir, 'index.ts', 'index.js'),
-  ) ?? moduleDir;
+  [moduleDir, process.cwd(), path.resolve(moduleDir, '..')].find((dir) => exists(dir, 'package.json')) ??
+  moduleDir;

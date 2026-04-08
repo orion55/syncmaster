@@ -16,27 +16,31 @@ SyncMaster is a Node.js/TypeScript CLI utility that synchronizes TV series and v
 
 There are no tests in this project.
 
-## Runtime Layout & `APP_DIR`
+## Runtime Layout & `ROOT_DIR`
 
-`src/appDir.ts` exports a single constant:
+`src/appDir.ts` exports one constant:
 
 ```ts
-export const APP_DIR = path.dirname(fileURLToPath(import.meta.url));
+export const ROOT_DIR =
+  [moduleDir, process.cwd(), path.resolve(moduleDir, '..')].find((dir) => exists(dir, 'package.json')) ??
+  moduleDir;
 ```
 
-- **development** (`npm run dev` / `npx tsx src/index.ts`): `APP_DIR` = `<repo>/src/`
-- **production** (ncc-bundled `dist/index.js`): every module is inlined into one file, so `import.meta.url` always points to the bundle → `APP_DIR` = `<deploy-dir>/`
+where `moduleDir = path.dirname(fileURLToPath(import.meta.url))`.
 
-All runtime directories are flat siblings of `APP_DIR` — no nested `src/` or `dist/` prefix:
+- **development** (`npm run dev`): `moduleDir` = `<repo>/src/` (no `package.json` there) → falls through to `process.cwd()` = `<repo>/` → `ROOT_DIR` = `<repo>/`
+- **production** (ncc bundle): `moduleDir` = `<deploy-dir>/` (no `package.json`) → falls through to `?? moduleDir` → `ROOT_DIR` = `<deploy-dir>/`
+
+All runtime directories are flat siblings of `ROOT_DIR` — no nested `src/` or `dist/` prefix:
 
 ```
-<APP_DIR>/
+<ROOT_DIR>/
 ├── fonts/     ← Big.flf (prod only, bundled by ncc)
 ├── logs/      ← syncmaster-YYYY-MM-DD.log, audit.json
 └── report/    ← report_DDMMYYYY_HHMM.txt
 ```
 
-Every module that touches the runtime folders imports `APP_DIR` and does `path.join(APP_DIR, 'report')` etc. Settings are not resolved from `APP_DIR`: `settings.yml` is loaded through `SETTINGS_PATH` (falling back to `./settings.yml` from the project root). There is no `NODE_ENV` check and no `pathUtils.ts`.
+Every module that touches the runtime folders imports `ROOT_DIR` and does `path.join(ROOT_DIR, 'logs')` etc. Settings are not resolved from `ROOT_DIR`: `settings.yml` is loaded through `SETTINGS_PATH` (falling back to `./settings.yml` from the project root). There is no `NODE_ENV` check and no `pathUtils.ts`.
 
 `dotenv.config()` is called inside `logger.service.ts` (via `import * as dotenv from 'dotenv'` + an explicit `dotenv.config()` call — **not** a side-effect import). It is the single `.env` entry point for the whole app: do not re-initialize dotenv elsewhere and do not add side-effect imports to simulate env loading. This works because `src/index.ts` imports `logger.service` at line 2, before any module that reads env-driven config. **Invariant:** `logger.service` must remain the second import in `index.ts`. Do not reorder it.
 
@@ -46,7 +50,7 @@ Entry point `src/index.ts` is a linear pipeline:
 
 1. `printSyncMaster()` — figlet banner
 2. `loadSettings()` — reads `settings.yml` from `SETTINGS_PATH` into a `Settings` object with `series`, `editorial_video`, and `series_map` as an array of `{ src, dest }`
-3. `syncSerial(settings.series)` — series sync
+3. `syncSerial(settings.series, settings.series_map)` — series sync
 4. `syncVideo(settings.editorial_video)` — generic video sync
 5. `report({ series, editorial })` — writes the report file
 
@@ -70,11 +74,12 @@ All three sync functions return `null` when `enabled: false`, when source/dest f
 ### `report.service.ts`
 
 - Builds sections for `series` (from `Map`) and `editorial` (from `SyncResult`), each sorted via `sortSeriesByKey`/`sortSyncResult` (locale-aware).
-- Writes to `<APP_DIR>/report/report_DDMMYYYY_HHMM.txt` only if at least one section has content. Skips the file entirely when nothing was synced.
+- Writes to `<ROOT_DIR>/report/report_DDMMYYYY_HHMM.txt` only if at least one section has content. Skips the file entirely when nothing was synced.
+- Series section header is taken from `settings.series.name` (not hardcoded).
 
 ### `logger.service.ts`
 
-Winston logger with two transports: colorized console and a daily-rotated file via `winston-daily-rotate-file`. Files live at `<logDir>/syncmaster-YYYY-MM-DD.log` with `20m` max size, `30d` retention, gzip archival, and an `audit.json` rotation manifest. `logDir` = `process.env.LOG_DIR` (resolved absolute) when set, otherwise `path.join(APP_DIR, 'logs')`. This module is also the project-wide dotenv entry point: it imports `* as dotenv from 'dotenv'` (namespace import) and calls `dotenv.config()` before reading any env var. Console uses `DD-MM-YYYY HH:mm:ss` timestamps; the file transport uses `YYYY-MM-DD HH:mm:ss`. Both transports share a `customFormat` printf that appends JSON-serialized meta and stack traces, with `Error` instances serialized via a custom replacer. The same transports are registered as `exceptionHandlers`, and `exitOnError: false` keeps the process alive on logged exceptions.
+Winston logger with two transports: colorized console and a daily-rotated file via `winston-daily-rotate-file`. Files live at `<logDir>/syncmaster-YYYY-MM-DD.log` with `20m` max size, `30d` retention, gzip archival, and an `audit.json` rotation manifest. `logDir` = `process.env.LOG_DIR` (resolved absolute) when set, otherwise `path.join(ROOT_DIR, 'logs')`. This module is also the project-wide dotenv entry point: it imports `* as dotenv from 'dotenv'` (namespace import) and calls `dotenv.config()` before reading any env var. Console uses `DD-MM-YYYY HH:mm:ss` timestamps; the file transport uses `YYYY-MM-DD HH:mm:ss`. Both transports share a `customFormat` printf that appends JSON-serialized meta and stack traces, with `Error` instances serialized via a custom replacer. The same transports are registered as `exceptionHandlers`, and `exitOnError: false` keeps the process alive on logged exceptions.
 
 ## Build Notes
 

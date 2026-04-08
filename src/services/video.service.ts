@@ -61,8 +61,12 @@ const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | null> =
             logger.info(`Начало копирования «${colors.green(trimmedFileName)}»`);
             await copyFileWithProgress(srcFile, destFile);
             logger.info(`Скопирован файл: ${srcFile} -> ${destFile}`);
-            fs.unlinkSync(srcFile);
-            logger.info(`Удалён файл: ${srcFile}`);
+            try {
+              fs.unlinkSync(srcFile);
+              logger.info(`Удалён файл: ${srcFile}`);
+            } catch (unlinkError) {
+              logger.error(`Ошибка удаления файла "${srcFile}"`, unlinkError);
+            }
             files.push(trimmedFileName);
           } catch (error) {
             logger.error(`Ошибка копирования файла "${srcFile}"`, error);

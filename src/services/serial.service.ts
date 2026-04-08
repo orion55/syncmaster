@@ -32,7 +32,7 @@ const syncSerial = async (
     return null;
   }
 
-  logger.info(`Синхронизация ${colors.green('сериалов')}`);
+  logger.info(`Синхронизация ${colors.green(settings.name)}`);
 
   const srcExists = fs.existsSync(src);
   const destExists = fs.existsSync(dest);

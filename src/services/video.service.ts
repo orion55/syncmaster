@@ -9,20 +9,15 @@ import colors from 'ansi-colors';
 const MAX_COUNT = 50;
 
 const trimFileName = (fileName: string): string => {
-  const parsed = path.parse(fileName);
-  const extension = parsed.ext;
-  const baseName = parsed.name;
+  const { name, ext } = path.parse(fileName);
 
-  if (baseName.length + extension.length <= MAX_COUNT) return fileName;
+  if (name.length + ext.length <= MAX_COUNT) return fileName.toLowerCase();
 
-  const allowedBaseLength = MAX_COUNT - extension.length;
-  let trimmedBase = baseName.substring(0, allowedBaseLength);
-  const lastSpace = trimmedBase.lastIndexOf(' ');
-  if (lastSpace > 0) {
-    trimmedBase = trimmedBase.substring(0, lastSpace);
-  }
+  const truncated = name.substring(0, MAX_COUNT - ext.length);
+  const lastSpace = truncated.lastIndexOf(' ');
+  const base = lastSpace > 0 ? truncated.substring(0, lastSpace) : truncated;
 
-  return trimmedBase + extension;
+  return (base + ext).toLowerCase();
 };
 
 const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | null> => {

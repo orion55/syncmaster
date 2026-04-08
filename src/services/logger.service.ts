@@ -42,6 +42,7 @@ const fileTransport = new DailyRotateFile({
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
+    format.uncolorize(),
     customFormat,
   ),
 });

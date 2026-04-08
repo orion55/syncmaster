@@ -1,6 +1,6 @@
 series:
   enabled: true
-  name: Сериалы
+  name: Турецкие
   src: d:\Project\syncmaster\data\src\Mamul
   dest: d:\Project\syncmaster\data\dest\турецкие
 

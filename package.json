@@ -21,9 +21,9 @@
   "scripts": {
     "dev": "npx tsx src/index.ts",
     "menu": "npx tsx src/menu-editor.ts",
-    "build": "ncc build src/index.ts -o dist -m",
-    "prepublishOnly": "npm run build",
-    "run": "ncc run src/index.ts"
+    "build:sync": "ncc build src/index.ts -o dist -m",
+    "build:menu": "ncc build src/menu-editor.ts -o dist/menubuild -m && move-file dist/menubuild/index.js dist/menu.js && rimraf dist/menubuild",
+    "build:all": "npm run build:sync && npm run build:menu"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -37,11 +37,14 @@
     "del-cli": "^6.0.0",
     "eslint": "^9.39.4",
     "globals": "^16.5.0",
+    "move-file-cli": "^3.0.0",
     "prettier": "3.8.1",
+    "rimraf": "^6.1.3",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.58.0"
   },
   "dependencies": {
+    "@clack/prompts": "^1.2.0",
     "ansi-colors": "^4.1.3",
     "cfonts": "^3.3.1",
     "cli-progress": "^3.12.0",

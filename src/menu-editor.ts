@@ -1,98 +1,101 @@
+import { intro, outro, select, text, confirm, note, log, isCancel, cancel } from '@clack/prompts';
+import colors from 'ansi-colors';
 import { MenuEditorService } from './services/menu-editor/menu-editor.service';
-import {
-  initReadline,
-  closeReadline,
-  ask,
-  askIndex,
-  confirm,
-} from './services/menu-editor/menu-editor.prompts';
-import {
-  renderHeader,
-  renderList,
-  renderMainMenu,
-  renderSuccess,
-  renderError,
-} from './services/menu-editor/menu-editor.ui';
-
-const sortedWithIndex = (svc: MenuEditorService) =>
-  svc
-    .getAll()
-    .map((item, i) => ({ ...item, originalIndex: i }))
-    .sort((a, b) => a.dest.localeCompare(b.dest, 'ru'));
+import { sortedWithIndex, formatList } from './services/menu-editor/menu-editor.helpers';
 
 const main = async (): Promise<void> => {
   const svc = new MenuEditorService();
-  initReadline();
   let isDirty = false;
 
-  try {
-    while (true) {
-      const sorted = sortedWithIndex(svc);
-      console.clear();
-      renderHeader();
-      renderList(sorted);
-      renderMainMenu();
+  intro('SyncMaster :: Редактор маппингов');
 
-      const choice = await ask('Действие:');
+  loop: while (true) {
+    const items = sortedWithIndex(svc);
 
-      switch (choice) {
-        case '1': {
-          console.log('');
-          const src = await ask('src (папка источника):');
-          const dest = await ask('dest (папка назначения):');
-          if (src && dest) {
-            svc.add({ src, dest });
-            isDirty = true;
-            renderSuccess('Запись добавлена');
-          } else {
-            renderError('src и dest не могут быть пустыми');
-          }
-          await ask('Enter для продолжения...');
-          break;
+    note(formatList(items), 'Маппинги series_map');
+
+    const action = await select({
+      message: 'Выберите действие:',
+      options: [
+        { value: 'add', label: colors.cyan('Добавить новую запись') },
+        { value: 'delete', label: colors.red('Удалить запись'), disabled: items.length === 0 },
+        { value: 'exit', label: colors.dim('Выйти') },
+      ],
+    });
+
+    if (isCancel(action)) {
+      cancel('Отменено');
+      break;
+    }
+
+    switch (action) {
+      case 'add': {
+        const src = await text({
+          message: 'src (папка источника):',
+          validate: (value) => (!value?.trim() ? 'Не может быть пустым' : undefined),
+        });
+        if (isCancel(src)) break loop;
+
+        const dest = await text({
+          message: 'dest (папка назначения):',
+          validate: (value) => (!value?.trim() ? 'Не может быть пустым' : undefined),
+        });
+        if (isCancel(dest)) break loop;
+
+        svc.add({ src: (src as string).trim(), dest: (dest as string).trim() });
+        isDirty = true;
+        log.success('Запись добавлена');
+        break;
+      }
+
+      case 'delete': {
+        const selected = await select({
+          message: 'Выберите запись для удаления:',
+          options: items.map((item) => ({
+            value: item.originalIndex,
+            label: `${colors.green(item.dest)}${colors.dim('  ←  ')}${colors.yellow(item.src)}`,
+          })),
+        });
+        if (isCancel(selected)) break;
+
+        const entry = items.find((item) => item.originalIndex === selected)!;
+        const doDelete = await confirm({ message: `Удалить "${entry.dest}"?` });
+        if (isCancel(doDelete) || !doDelete) break;
+
+        const { srcPath, destPath } = svc.getItemFolderPaths(entry);
+        svc.delete(entry.originalIndex);
+        isDirty = true;
+        log.success('Запись удалена');
+
+        const doFolders = await confirm({ message: 'Удалить также папки?' });
+        if (!isCancel(doFolders) && doFolders) {
+          const { srcDeleted, destDeleted } = svc.deleteFolders(entry);
+          if (srcDeleted) log.success(`Папка удалена: ${srcPath}`);
+          if (destDeleted) log.success(`Папка удалена: ${destPath}`);
+          if (!srcDeleted && !destDeleted) log.error('Папки не найдены');
         }
+        break;
+      }
 
-        case '2': {
-          if (svc.count === 0) {
-            renderError('Список пуст, нечего удалять');
-            await ask('Enter для продолжения...');
-            break;
+      case 'exit': {
+        if (isDirty) {
+          const save = await confirm({ message: 'Сохранить изменения?' });
+          if (isCancel(save)) break loop;
+          if (save) {
+            svc.sortByDest();
+            svc.save();
+            log.success('Изменения сохранены');
           }
-          const displayIdx = await askIndex(
-            `Номер записи (1–${svc.count}), 0 = отмена:`,
-            svc.count,
-          );
-          if (displayIdx === null) break;
-
-          const entry = sorted[displayIdx];
-          if (await confirm(`Удалить "${entry.src}"?`)) {
-            const { srcPath, destPath } = svc.getItemFolderPaths(entry);
-            svc.delete(entry.originalIndex);
-            isDirty = true;
-            renderSuccess('Запись удалена');
-            if (await confirm('Удалить также папки?')) {
-              const { srcDeleted, destDeleted } = svc.deleteFolders(entry);
-              if (srcDeleted) renderSuccess(`Папка удалена: ${srcPath}`);
-              if (destDeleted) renderSuccess(`Папка удалена: ${destPath}`);
-              if (!srcDeleted && !destDeleted) renderError('Папки не найдены');
-            }
-            await ask('Enter для продолжения...');
-          }
-          break;
-        }
-
-        case '0': {
-          if (isDirty && !(await confirm('Сохранить изменения?'))) {
-            return;
-          }
+        } else {
           svc.sortByDest();
           svc.save();
-          return;
         }
+        break loop;
       }
     }
-  } finally {
-    closeReadline();
   }
+
+  outro('До свидания!');
 };
 
 void main();

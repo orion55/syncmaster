@@ -19,10 +19,6 @@ export class MenuEditorService {
     return this.doc.get('series_map') as YAMLSeq;
   }
 
-  get count(): number {
-    return this.getSeq().items.length;
-  }
-
   getAll(): SeriesMapItem[] {
     return this.getSeq().items.map((item) => {
       const map = item as YAMLMap;

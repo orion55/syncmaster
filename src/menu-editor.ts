@@ -7,12 +7,12 @@ const main = async (): Promise<void> => {
   const svc = new MenuEditorService();
   let isDirty = false;
 
-  intro('SyncMaster :: Редактор маппингов');
+  intro(colors.bold.cyan('SyncMaster') + colors.dim(' :: ') + colors.bold.white('Menu'));
 
   loop: while (true) {
     const items = sortedWithIndex(svc);
 
-    note(formatList(items), 'Маппинги series_map');
+    note(formatList(items), 'Турецкие');
 
     const action = await select({
       message: 'Выберите действие:',

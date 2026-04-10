@@ -5,6 +5,9 @@ import type { Document, YAMLMap, YAMLSeq } from 'yaml';
 import type { SeriesMapItem } from '../settings/settings.types';
 import { resolveSettingsPath } from '../settings/settings.service';
 
+type FolderPaths = { srcPath: string; destPath: string };
+type DeleteFoldersResult = { srcDeleted: boolean; destDeleted: boolean };
+
 export class MenuEditorService {
   private doc: Document;
   private readonly filePath: string;
@@ -16,7 +19,11 @@ export class MenuEditorService {
   }
 
   private getSeq(): YAMLSeq {
-    return this.doc.get('series_map') as YAMLSeq;
+    const seq = this.doc.get('series_map');
+    if (!seq) {
+      throw new Error('settings.yml: отсутствует раздел series_map');
+    }
+    return seq as YAMLSeq;
   }
 
   getAll(): SeriesMapItem[] {
@@ -47,7 +54,11 @@ export class MenuEditorService {
     seq.delete(index);
   }
 
-  getItemFolderPaths(item: SeriesMapItem): { srcPath: string; destPath: string } {
+  getSeriesName(): string {
+    return (this.doc.getIn(['series', 'name']) as string) ?? 'series_map';
+  }
+
+  getItemFolderPaths(item: SeriesMapItem): FolderPaths {
     const srcBase = this.doc.getIn(['series', 'src']) as string;
     const destBase = this.doc.getIn(['series', 'dest']) as string;
     return {
@@ -56,8 +67,7 @@ export class MenuEditorService {
     };
   }
 
-  deleteFolders(item: SeriesMapItem): { srcDeleted: boolean; destDeleted: boolean } {
-    const { srcPath, destPath } = this.getItemFolderPaths(item);
+  deleteFolders(srcPath: string, destPath: string): DeleteFoldersResult {
     const srcDeleted = fs.existsSync(srcPath);
     const destDeleted = fs.existsSync(destPath);
     if (srcDeleted) fs.rmSync(srcPath, { recursive: true, force: true });

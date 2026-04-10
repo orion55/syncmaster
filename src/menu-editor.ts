@@ -12,7 +12,7 @@ const main = async (): Promise<void> => {
   loop: while (true) {
     const items = sortedWithIndex(svc);
 
-    note(formatList(items), 'Турецкие');
+    note(formatList(items), svc.getSeriesName());
 
     const action = await select({
       message: 'Выберите действие:',
@@ -69,7 +69,7 @@ const main = async (): Promise<void> => {
 
         const doFolders = await confirm({ message: 'Удалить также папки?' });
         if (!isCancel(doFolders) && doFolders) {
-          const { srcDeleted, destDeleted } = svc.deleteFolders(entry);
+          const { srcDeleted, destDeleted } = svc.deleteFolders(srcPath, destPath);
           if (srcDeleted) log.success(`Папка удалена: ${srcPath}`);
           if (destDeleted) log.success(`Папка удалена: ${destPath}`);
           if (!srcDeleted && !destDeleted) log.error('Папки не найдены');
@@ -98,4 +98,7 @@ const main = async (): Promise<void> => {
   outro('До свидания!');
 };
 
-void main();
+void main().catch((err) => {
+  console.error('Ошибка:', err instanceof Error ? err.message : err);
+  process.exit(1);
+});

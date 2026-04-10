@@ -46,6 +46,8 @@ const syncVideo = async (settings: SeriesSettings): Promise<SyncResult | null> =
 
     if (srcFiles.length !== 0) {
       for (const file of srcFiles) {
+        if (!fs.statSync(path.join(src, file)).isFile()) continue;
+
         const trimmedFileName = trimFileName(file);
 
         if (!destFilesSet.has(trimmedFileName)) {

@@ -16,7 +16,7 @@ export const copyFileWithProgress = async (src: string, dest: string): Promise<v
     },
     Presets.shades_classic,
   );
-  bar.start(totalSize, 0);
+  bar.start(Math.max(totalSize, 1), 0);
 
   const readStream = fs.createReadStream(src);
   const writeStream = fs.createWriteStream(dest);
@@ -25,7 +25,16 @@ export const copyFileWithProgress = async (src: string, dest: string): Promise<v
     bar.increment(chunk.length);
   });
 
-  await pipeline(readStream, writeStream);
+  try {
+    await pipeline(readStream, writeStream);
+  } catch (err) {
+    try {
+      fs.unlinkSync(dest);
+    } catch {
+      // ignore cleanup error
+    }
+    throw err;
+  }
 
   bar.stop();
 };

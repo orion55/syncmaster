@@ -68,6 +68,8 @@ const syncSerial = async (
       }
 
       for (const srcFile of srcFiles) {
+        if (!fs.statSync(path.join(srcDir, srcFile)).isFile()) continue;
+
         if (path.extname(srcFile).toLowerCase() === '.!qb') {
           logger.info(`Пропущен файл: ${srcFile}`);
           continue;
@@ -83,7 +85,7 @@ const syncSerial = async (
           logger.info(`Начало копирования «${colors.green(destFolderName)}»`);
           await copyFileWithProgress(srcFilePath, destFilePath);
           logger.info(
-            `Скопирован файл: ${srcFolderName}\\${srcFile} -> ${destFolderName}\\${newFileName}`,
+            `Скопирован файл: ${path.join(srcFolderName, srcFile)} -> ${path.join(destFolderName, newFileName)}`,
           );
           filesCopied++;
           filesMap.set(destFolderName, (filesMap.get(destFolderName) || 0) + 1);

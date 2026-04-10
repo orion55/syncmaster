@@ -25,11 +25,7 @@ const consoleFormat = format.combine(
   format.errors({ stack: true }),
   format.splat(),
   format.colorize({ all: false }),
-  format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    const metaStr = Object.keys(meta).length ? ` ${serializeMeta(meta)}` : '';
-    const stackStr = stack ? `\n${stack}` : '';
-    return `${timestamp} [${level}]: ${message}${metaStr}${stackStr}`;
-  }),
+  customFormat,
 );
 
 const fileTransport = new DailyRotateFile({

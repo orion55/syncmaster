@@ -21,7 +21,7 @@ const report = (input: InputData) => {
     const sortedSeries = sortSeriesByKey(series);
 
     content += `${seriesName}\n`;
-    sortedSeries?.forEach((count, title) => {
+    sortedSeries.forEach((count, title) => {
       content += count === 1 ? `\t${title}\n` : `\t${title} - ${count} серии\n`;
     });
     content += '\n';

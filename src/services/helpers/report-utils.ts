@@ -1,10 +1,9 @@
 import dayjs from 'dayjs';
 import { SyncResult } from '../sync.types';
 
-type SeriesMap = Map<string, number> | null;
+type SeriesMap = Map<string, number>;
 
 export const sortSeriesByKey = (series: SeriesMap): SeriesMap => {
-  if (series === null) return null;
   const sortedEntries = Array.from(series.entries()).sort((entryA, entryB) =>
     entryA[0].localeCompare(entryB[0]),
   );

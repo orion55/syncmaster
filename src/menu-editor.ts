@@ -1,18 +1,26 @@
-import { intro, outro, select, text, confirm, note, log, isCancel, cancel } from '@clack/prompts';
+import { intro, outro, select, text, confirm, log, isCancel, cancel } from '@clack/prompts';
 import colors from 'ansi-colors';
+import cfonts from 'cfonts';
 import { MenuEditorService } from './services/menu-editor/menu-editor.service';
-import { sortedWithIndex, formatList } from './services/menu-editor/menu-editor.helpers';
+import {
+  appendRemovedSeriesName,
+  sortedWithIndex,
+} from './services/menu-editor/menu-editor.helpers';
 
 const main = async (): Promise<void> => {
   const svc = new MenuEditorService();
   let isDirty = false;
 
-  intro(colors.bold.cyan('SyncMaster') + colors.dim(' :: ') + colors.bold.white('Menu'));
+  cfonts.say('Sync-Menu', {
+    font: 'block',
+    align: 'left',
+    colors: ['green', 'gray'],
+    space: false,
+  });
+  intro('');
 
   loop: while (true) {
     const items = sortedWithIndex(svc);
-
-    note(formatList(items), svc.getSeriesName());
 
     const action = await select({
       message: 'Выберите действие:',
@@ -63,6 +71,7 @@ const main = async (): Promise<void> => {
         if (isCancel(doDelete) || !doDelete) break;
 
         const { srcPath, destPath } = svc.getItemFolderPaths(entry);
+        appendRemovedSeriesName(entry.dest);
         svc.delete(entry.originalIndex);
         isDirty = true;
         log.success('Запись удалена');

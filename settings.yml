@@ -1,29 +1,31 @@
 series:
   enabled: true
   name: Турецкие
-  src: d:\Project\syncmaster\data\src\Mamul
-  dest: d:\Project\syncmaster\data\dest\турецкие
+  src: y:\Mamul
+  dest: f:\Турецкие
 
 editorial_video:
   enabled: true
   name: Редакция
-  src: d:\Project\syncmaster\data\src\Редакция
-  dest: d:\Project\syncmaster\data\dest\Редакция
+  src: e:\Storage\Редакция
+  dest: f:\Редакция
 
 series_map:
-  - src: Dalekiy gorod 2 sezon
-    dest: Далёкий город
-  - src: Zavist
-    dest: Зависть
-  - src: Ayni Yagmur Altinda.s01.WEB-DLRip1080p
-    dest: Под одним дождём
-  - src: Güller ve Günahlar.s01.WEB-DLRip1080p.zhekannov
-    dest: Розы и грехи
-  - src: A.B.I.s01.WEB-DLRip1080p
-    dest: Семья - это испытание
-  - src: Sevdigim Sensin.s01.WEB-DLRip1080p
-    dest: Ты — тот, кого я люблю
-  - src: Sheriff.Country.2025.S01.WEB-DL.1080p.TVShows.LE-Production
-    dest: Шериф округа
-  - src: Tasacak Bu Deniz.s01.WEB-DLRip1080p
-    dest: Это море переполнится
+  - src: Muhtemel Ask.s01.WEB-DLRip720p
+    dest: Возможная любовь
+  - src: Haysiyet.s01.WEB-DLRip1080p
+    dest: Достоинство
+  - src: Daha 17
+    dest: Ещё 17
+  - src: Kizilcik Serbeti.s05.WEB-DLRip1080p
+    dest: Кизиловый щербет
+  - src: Mercan Kosk.s01.WEB-DLRip1080p
+    dest: Коралловый дворец
+  - src: Ask ve Taht.s01.WEB-DLRip1080p
+    dest: Любовь и трон
+  - src: Gunesin Dogdugu Yer.s01.WEB-DLRip1080p
+    dest: Место, где восходит солнце
+  - src: Tuzlu Kahve.s01.WEB-DLRip1080p
+    dest: Солёный кофе
+  - src: Sevdan Bir Atest.s01.WEB-DLRip1080p
+    dest: Твоя любовь - огонь

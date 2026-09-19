@@ -1,4 +1,7 @@
 import colors from 'ansi-colors';
+import fs from 'fs';
+import path from 'path';
+import { ROOT_DIR } from '../../appDir';
 import type { MenuEditorService } from './menu-editor.service';
 import type { SortedItem } from './menu-editor.types';
 
@@ -16,4 +19,17 @@ export const formatList = (items: SortedItem[]): string => {
         `${colors.dim(`${String(index + 1).padStart(2)}.`)} ${colors.green(item.dest)}${colors.dim('  ←  ')}${colors.yellow(item.src)}`,
     )
     .join('\n');
+};
+
+export const appendRemovedSeriesName = (
+  name: string,
+  filePath = path.join(ROOT_DIR, 'remove.txt'),
+): void => {
+  const names = fs.existsSync(filePath)
+    ? fs.readFileSync(filePath, 'utf8').split(/\r?\n/).filter(Boolean)
+    : [];
+
+  names.push(name);
+  names.sort((nameA, nameB) => nameA.localeCompare(nameB, 'ru'));
+  fs.writeFileSync(filePath, `${names.join('\n')}\n`, 'utf8');
 };
